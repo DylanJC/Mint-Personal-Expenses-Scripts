@@ -33,11 +33,17 @@ def import_recent_transactions(testing=True):
     existing_ids = [i for i in id_column if i]
     df = df[~df['id'].isin(existing_ids)]
 
+    other_transactions = df[~df.accountId.isin(ids)]
+    other_transactions = other_transactions[other_transactions.amount < 0.00]
+    other_transactions = other_transactions.reindex(columns=['description', 'amount', 'date'])
+    other_transactions = other_transactions[::-1]
+
     df = df[df.accountId.isin(ids)]
     df = df[df.amount < 0.00]
 
     df = df.replace(id_dict)
-    df = df.replace(vendor_dict)
+    vd = {'.*' + k + '.*': v for k, v in vendor_dict.items()}
+    df = df.replace(regex=vd)
     df['amount'] = df['amount'].mul(-1)
 
     df['Item'] = ''
@@ -51,7 +57,10 @@ def import_recent_transactions(testing=True):
     num_rows = len(personal_expenses_2022.col_values(5))
     personal_expenses_2022.update("A" + str(num_rows + 1) + ":H", df.values.tolist(),
                                   value_input_option='USER_ENTERED')
+    personal_expenses_2022.update("C" + str(len(df) + num_rows + 5) + ":E", other_transactions.values.tolist(),
+                                  value_input_option='USER_ENTERED')
 
+    print(transactions)
     if not testing:
         mint.close()
 
@@ -62,7 +71,6 @@ def week_ago(date):
     week_ago_str = one_week_prior.strftime('%m/%d/%y')
 
     return week_ago_str
-
 
 if __name__ == '__main__':
     import_recent_transactions(testing=False)
