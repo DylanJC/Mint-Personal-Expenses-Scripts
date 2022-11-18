@@ -6,7 +6,7 @@ from config import username, password, sheet_name, subsheet_name, ids, id_dict, 
 import datetime as dt
 
 
-def import_recent_transactions(testing=True):
+def import_recent_transactions(testing=True, headless=True):
     scope = ['https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive"]
 
     credentials = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
@@ -15,7 +15,7 @@ def import_recent_transactions(testing=True):
     personal_expenses_2022 = sheet.worksheet(subsheet_name)
 
     if not testing:
-        mint = mintapi.Mint(username, password)
+        mint = mintapi.Mint(username, password, headless)
 
         most_recent_date = personal_expenses_2022.col_values(5)[-1]
         start_date = week_ago(most_recent_date)
@@ -73,4 +73,4 @@ def week_ago(date):
     return week_ago_str
 
 if __name__ == '__main__':
-    import_recent_transactions(testing=False)
+    import_recent_transactions(testing=False, headless=True)
