@@ -2,7 +2,7 @@ import mintapi
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from config import username, password, sheet_name, subsheet_name, ids, id_dict, vendor_dict, category_dict, test_transactions
+from config import username, password, mfa_token, sheet_name, subsheet_name, ids, id_dict, vendor_dict, category_dict, test_transactions
 import datetime as dt
 
 
@@ -15,7 +15,7 @@ def import_recent_transactions(testing=True, headless=True):
     personal_expenses_2022 = sheet.worksheet(subsheet_name)
 
     if not testing:
-        mint = mintapi.Mint(username, password, headless=headless)
+        mint = mintapi.Mint(username, password, headless=headless, mfa_token=mfa_token, mfa_method="soft-token")
 
         most_recent_date = personal_expenses_2022.col_values(5)[-1]
         start_date = week_ago(most_recent_date)
