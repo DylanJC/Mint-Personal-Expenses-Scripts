@@ -45,6 +45,7 @@ def import_recent_transactions(testing=True, headless=True):
     vd = {'.*' + k + '.*': v for k, v in vendor_dict.items()}
     df = df.replace(regex=vd)
     df['amount'] = df['amount'].mul(-1)
+    df['description'] = df['description'].apply(lambda x: x.title())
 
     df['Item'] = ''
     df['Category'] = df['description'].map(category_dict)
@@ -73,4 +74,4 @@ def week_ago(date):
     return week_ago_str
 
 if __name__ == '__main__':
-    import_recent_transactions(testing=False, headless=True)
+    import_recent_transactions(testing=True, headless=True)
